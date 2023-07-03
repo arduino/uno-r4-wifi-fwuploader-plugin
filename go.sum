@@ -2,6 +2,8 @@ github.com/arduino/arduino-cli v0.0.0-20230630155703-fe6d7499eb5e h1:gmlrLhRuuIY
 github.com/arduino/arduino-cli v0.0.0-20230630155703-fe6d7499eb5e/go.mod h1:2E4tNTNWuf4CtG/pF/Y+fRO6JXxVEcbDDStjZYtMK2c=
 github.com/arduino/fwuploader-plugin-helper v0.0.0-20230626132535-2effbfcc7853 h1:SEWDw4xcN+qNReANPPlnlGn/R4uP2QHdZyYI4DEYwNs=
 github.com/arduino/fwuploader-plugin-helper v0.0.0-20230626132535-2effbfcc7853/go.mod h1:y7Vo30dco4xAb39pQ2CRaCvayADjhOBAMrlfji4AYuM=
+github.com/arduino/fwuploader-plugin-helper v0.0.0-20230703153402-baed5fcc916f h1:LBTgrjpSLxf4DjavgrKvEI48GwSbTdvtZEMLw2FBzVg=
+github.com/arduino/fwuploader-plugin-helper v0.0.0-20230703153402-baed5fcc916f/go.mod h1:y7Vo30dco4xAb39pQ2CRaCvayADjhOBAMrlfji4AYuM=
 github.com/arduino/go-paths-helper v1.9.1 h1:qpK+zMMjsklSBQa09/P5FZ/uf3LyjVmJK3DLeyiGjCc=
 github.com/arduino/go-paths-helper v1.9.1/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
@@ -44,6 +46,8 @@ github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 go.bug.st/relaxed-semver v0.10.2 h1:d/ATAG3MByySZgg7rFj+Wj0fhvP4zfx9Z8Dn/NSCoFg=
 go.bug.st/relaxed-semver v0.10.2/go.mod h1:lPVGdtzbQ9/2fv6iXqIXWHOj6cMTUJ/l/Lu1w+sgdio=
+go.bug.st/relaxed-semver v0.11.0 h1:ngzpUlBEZ5F9hJnMZP55LIFbgX3bCztBBufMhJViAsY=
+go.bug.st/relaxed-semver v0.11.0/go.mod h1:rqPEm+790OTQlAdfSJSHWwpKOg3A8UyvAWMZxYkQivc=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
 golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
