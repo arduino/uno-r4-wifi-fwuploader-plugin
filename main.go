@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/arduino/arduino-cli/executils"
@@ -17,10 +18,19 @@ const (
 )
 
 func main() {
-	helper.RunPlugin(&unoR4WifiPlugin{})
+	espflashPath, err := helper.FindToolPath("espflash", semver.MustParse("2.0.0"))
+	if err != nil {
+		log.Fatalln("Couldn't find espflash@2.0.0 binary")
+	}
+
+	helper.RunPlugin(&unoR4WifiPlugin{
+		espflashBin: espflashPath.Join("espflash"),
+	})
 }
 
-type unoR4WifiPlugin struct{}
+type unoR4WifiPlugin struct {
+	espflashBin *paths.Path
+}
 
 var _ helper.Plugin = (*unoR4WifiPlugin)(nil)
 
@@ -59,7 +69,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 	// Wait a bit before flashing the firmware to allow the board to become available again.
 	time.Sleep(3 * time.Second)
 
-	cmd, err := executils.NewProcess([]string{}, "espflash", "flash", firmwarePath.String(), "-p", portAddress)
+	cmd, err := executils.NewProcess([]string{}, p.espflashBin.String(), "flash", firmwarePath.String(), "-p", portAddress)
 	if err != nil {
 		return err
 	}
@@ -102,7 +112,7 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 	// Wait a bit before flashing the certificate to allow the board to become available again.
 	time.Sleep(3 * time.Second)
 
-	cmd, err := executils.NewProcess([]string{}, "espflash", "write-bin", "-p", portAddress, "-b", "921600", "0x3C0000", certificatePath.String())
+	cmd, err := executils.NewProcess([]string{}, p.espflashBin.String(), "write-bin", "-p", portAddress, "-b", "921600", "0x3C0000", certificatePath.String())
 	if err != nil {
 		return err
 	}
