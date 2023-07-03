@@ -69,7 +69,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 		return err
 	}
 
-	fmt.Fprintf(feedback.Out(), "\nUpload completed! You can now detach the board.\n")
+	fmt.Fprintf(feedback.Out(), "\nUpload completed! To complete the update process please disconnect and then reconnect the board.\n")
 	return nil
 }
 
@@ -112,7 +112,7 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 		return err
 	}
 
-	fmt.Fprintf(feedback.Out(), "\nUpload completed! You can now detach the board.\n")
+	fmt.Fprintf(feedback.Out(), "\nUpload completed! To complete the update process please disconnect and then reconnect the board.\n")
 	return nil
 }
 
