@@ -118,7 +118,7 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 
 // GetFirmwareVersion retrieve the firmware version installed on the board
 func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helper.PluginFeedback) (*semver.RelaxedVersion, error) {
-	d, err := openFirstHID()
+	d, err := openHID(portAddress) // if port is empty, fallback to vid+pid
 	if err != nil {
 		return nil, err
 	}
