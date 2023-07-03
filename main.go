@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"time"
 
+	"github.com/arduino/arduino-cli/executils"
 	helper "github.com/arduino/fwuploader-plugin-helper"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sstallion/go-hid"
@@ -60,10 +59,12 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 	// Wait a bit before flashing the firmware to allow the board to become available again.
 	time.Sleep(3 * time.Second)
 
-	cmd := exec.Command("espflash", "flash", firmwarePath.String(), "-p", portAddress)
-	cmd.Stdout = feedback.Out()
-	cmd.Stderr = feedback.Err()
-	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd, err := executils.NewProcess([]string{}, "espflash", "flash", firmwarePath.String(), "-p", portAddress)
+	if err != nil {
+		return err
+	}
+	cmd.RedirectStderrTo(feedback.Err())
+	cmd.RedirectStdoutTo(feedback.Out())
 	if err := cmd.Run(); err != nil {
 		return err
 	}
@@ -101,10 +102,12 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 	// Wait a bit before flashing the certificate to allow the board to become available again.
 	time.Sleep(3 * time.Second)
 
-	cmd := exec.Command("espflash", "write-bin", "-p", portAddress, "-b", "921600", "0x3C0000", certificatePath.String())
-	cmd.Stdout = feedback.Out()
-	cmd.Stderr = feedback.Err()
-	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd, err := executils.NewProcess([]string{}, "espflash", "write-bin", "-p", portAddress, "-b", "921600", "0x3C0000", certificatePath.String())
+	if err != nil {
+		return err
+	}
+	cmd.RedirectStderrTo(feedback.Err())
+	cmd.RedirectStdoutTo(feedback.Out())
 	if err := cmd.Run(); err != nil {
 		return err
 	}
