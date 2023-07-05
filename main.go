@@ -10,7 +10,6 @@ import (
 	"github.com/arduino/arduino-cli/executils"
 	helper "github.com/arduino/fwuploader-plugin-helper"
 	"github.com/arduino/go-paths-helper"
-	"github.com/sstallion/go-hid"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -115,11 +114,10 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 
 // GetFirmwareVersion retrieve the firmware version installed on the board
 func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helper.PluginFeedback) (*semver.RelaxedVersion, error) {
-	d, err := openHID(portAddress) // if port is empty, fallback to vid+pid
+	d, err := openHID()
 	if err != nil {
 		return nil, err
 	}
-	defer hid.Exit()
 
 	buf := make([]byte, 65)
 	if _, err := d.GetFeatureReport(buf); err != nil {
@@ -163,17 +161,13 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 
 	// try to use HID to reboot in case firmware version is v0.1.0
 	{
-		d, err := openFirstHID()
+		d, err := openHID()
 		if err != nil {
 			return fmt.Errorf("open HID: %v", err)
 		}
 
 		if err := reboot(d); err != nil {
 			return fmt.Errorf("reboot HID: %v", err)
-		}
-
-		if err := hid.Exit(); err != nil {
-			return fmt.Errorf("exit HID: %v", err)
 		}
 
 		time.Sleep(3 * time.Second)

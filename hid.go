@@ -1,24 +1,14 @@
 package main
 
-import "github.com/sstallion/go-hid"
+import "github.com/karalabe/hid"
 
 const (
 	vid uint16 = 0x2341
 	pid uint16 = 0x1002
 )
 
-func openFirstHID() (*hid.Device, error) {
-	return openHID("")
-}
-
-func openHID(port string) (*hid.Device, error) {
-	if err := hid.Init(); err != nil {
-		return nil, err
-	}
-	if port == "" {
-		return hid.OpenFirst(vid, pid)
-	}
-	return hid.OpenPath(port)
+func openHID() (*hid.Device, error) {
+	return hid.Open(vid, pid)
 }
 
 func reboot(d *hid.Device) error {
