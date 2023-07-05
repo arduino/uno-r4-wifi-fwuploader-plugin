@@ -19,3 +19,9 @@
 
 # Go workspace file
 go.work
+
+.vscode
+main
+bossac
+espflash
+fw
