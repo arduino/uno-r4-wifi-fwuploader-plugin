@@ -1,0 +1,2 @@
+default_port: /dev/ttyACM0
+fqbn: arduino:renesas_uno:unor4wifi
