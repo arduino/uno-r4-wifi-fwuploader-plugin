@@ -135,6 +135,7 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 	if err != nil {
 		return err
 	}
+	defer rebootFile.Remove()
 
 	newPortAddress, err := serialutils.Reset(portAddress, false, nil, false)
 	if err != nil {
