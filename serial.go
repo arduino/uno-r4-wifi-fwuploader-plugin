@@ -9,23 +9,23 @@ import (
 type serialCommand string
 
 const (
-	rebootCommand  serialCommand = "r"
-	versionCommand serialCommand = "v"
+	rebootCommand  serialCommand = "r\n\r"
+	versionCommand serialCommand = "v\n\r"
 )
 
 type serialPort string
 
-func sendSerialCommandAndClose(portAddress serialPort, msg serialCommand) error {
-	port, err := serial.Open(string(portAddress), &serial.Mode{
+func openSerialPort(portAddress serialPort) (serial.Port, error) {
+	return serial.Open(string(portAddress), &serial.Mode{
 		BaudRate: 9600,
 		Parity:   serial.NoParity,
 		DataBits: 8,
 		StopBits: serial.OneStopBit,
 	})
-	if err != nil {
-		return fmt.Errorf("open serial port: %v", err)
-	}
-	if _, err := port.Write([]byte(string(msg) + "\n\r")); err != nil {
+}
+
+func sendSerialCommandAndClose(port serial.Port, msg serialCommand) error {
+	if _, err := port.Write([]byte(string(msg))); err != nil {
 		return fmt.Errorf("write to serial port: %v", err)
 	}
 	if err := port.Close(); err != nil {

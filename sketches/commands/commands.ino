@@ -26,6 +26,15 @@ void reboot() {
 }
 
 void version() {
+  static char fw_version[12];
+  std::string res = "";
+  if(modem.write(std::string(PROMPT(_FWVERSION)), res, CMD_READ(_FWVERSION))) {
+      memset(fw_version,0x00,12);
+      memcpy(fw_version, res.c_str(), res.size() < 12 ? res.size() : 11);
+      Serial.println(fw_version);
+   } else {
+       Serial.println("0.0.0");
+   }
 }
 
 void setup() {

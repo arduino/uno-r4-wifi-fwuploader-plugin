@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"embed"
 	"fmt"
 	"log"
@@ -114,19 +115,60 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 
 // GetFirmwareVersion retrieve the firmware version installed on the board
 func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helper.PluginFeedback) (*semver.RelaxedVersion, error) {
-	d, err := openHID()
+	if err := p.uploadCommandsSketch(portAddress, feedback); err != nil {
+		return nil, err
+	}
+
+	port, err := openSerialPort(serialPort(portAddress))
 	if err != nil {
 		return nil, err
 	}
+	defer port.Close()
 
-	buf := make([]byte, 65)
-	if _, err := d.GetFeatureReport(buf); err != nil {
-		return nil, err
+	if _, err := port.Write([]byte(string(versionCommand))); err != nil {
+		return nil, fmt.Errorf("write to serial port: %v", err)
 	}
-	return semver.ParseRelaxed(fmt.Sprintf("%d.%d.%d", buf[1], buf[2], buf[3])), nil
+
+	var version string
+	scanner := bufio.NewScanner(port)
+	for scanner.Scan() {
+		version = scanner.Text()
+		break
+	}
+
+	return semver.ParseRelaxed(version), nil
 }
 
 func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeedback) error {
+	p.uploadCommandsSketch(portAddress, feedback)
+	port, err := openSerialPort(serialPort(portAddress))
+	if err != nil {
+		return err
+	}
+	if err := sendSerialCommandAndClose(port, rebootCommand); err != nil {
+		return err
+	}
+
+	time.Sleep(3 * time.Second)
+
+	// try to use HID to reboot in case firmware version is v0.1.0
+	{
+		d, err := openHID()
+		if err != nil {
+			return fmt.Errorf("open HID: %v", err)
+		}
+
+		if err := reboot(d); err != nil {
+			return fmt.Errorf("reboot HID: %v", err)
+		}
+
+		time.Sleep(3 * time.Second)
+	}
+
+	return nil
+}
+
+func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *helper.PluginFeedback) error {
 	rebootData, err := rebootBinary.ReadFile("sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.bin")
 	if err != nil {
 		return err
@@ -155,24 +197,5 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 	}
 
 	time.Sleep(1 * time.Second)
-
-	sendSerialCommandAndClose(serialPort(portAddress), rebootCommand)
-
-	time.Sleep(3 * time.Second)
-
-	// try to use HID to reboot in case firmware version is v0.1.0
-	{
-		d, err := openHID()
-		if err != nil {
-			return fmt.Errorf("open HID: %v", err)
-		}
-
-		if err := reboot(d); err != nil {
-			return fmt.Errorf("reboot HID: %v", err)
-		}
-
-		time.Sleep(3 * time.Second)
-	}
-
 	return nil
 }
