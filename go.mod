@@ -6,8 +6,8 @@ go 1.20
 replace github.com/karalabe/hid => github.com/bcmi-labs/hid v0.0.0-20230703110227-931f677e7f17
 
 require (
-	github.com/arduino/arduino-cli v0.0.0-20230704194506-0f516bb6801b
-	github.com/arduino/fwuploader-plugin-helper v0.0.0-20230704094631-4f3552f11c45
+	github.com/arduino/arduino-cli v0.0.0-20230706071323-df12786440c1
+	github.com/arduino/fwuploader-plugin-helper v0.0.0-20230706160803-17fd16a4651c
 	github.com/arduino/go-paths-helper v1.9.1
 	github.com/karalabe/hid v0.0.0-00010101000000-000000000000
 	go.bug.st/relaxed-semver v0.11.0
