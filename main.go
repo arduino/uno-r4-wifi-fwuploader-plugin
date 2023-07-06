@@ -141,6 +141,7 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 
 func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeedback) error {
 	p.uploadCommandsSketch(portAddress, feedback)
+
 	port, err := openSerialPort(serialPort(portAddress))
 	if err != nil {
 		return err
@@ -151,19 +152,9 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 
 	time.Sleep(3 * time.Second)
 
-	// try to use HID to reboot in case firmware version is v0.1.0
-	{
-		d, err := openHID()
-		if err != nil {
-			return fmt.Errorf("open HID: %v", err)
-		}
+	rebootUsingHID() // In case firmware version is v0.1.0 us HID to reboot
 
-		if err := reboot(d); err != nil {
-			return fmt.Errorf("reboot HID: %v", err)
-		}
-
-		time.Sleep(3 * time.Second)
-	}
+	time.Sleep(3 * time.Second)
 
 	return nil
 }
