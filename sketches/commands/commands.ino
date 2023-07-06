@@ -20,7 +20,6 @@ char waitResponse() {
 }
 
 void reboot() {
-  modem.begin();
   std::string res = "";
   modem.write(std::string(PROMPT("+RESET=1")), res, CMD("+RESET=1"));
 }
@@ -39,6 +38,7 @@ void version() {
 
 void setup() {
   Serial.begin(9600);
+  modem.begin();
   char command = waitResponse();
 
   switch (command) {
