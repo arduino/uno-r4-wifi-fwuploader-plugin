@@ -1,2 +1,8 @@
 default_port: /dev/ttyACM0
-fqbn: arduino:renesas_uno:unor4wifi
+default_fqbn: arduino:renesas_uno:unor4wifi
+
+profiles:
+  default:
+    fqbn: arduino:renesas_uno:unor4wifi
+    platforms:
+      - platform: arduino:renesas_uno (1.0.1)

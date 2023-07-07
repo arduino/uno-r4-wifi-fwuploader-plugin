@@ -25,7 +25,7 @@ var (
 )
 
 //go:embed sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.bin
-var rebootBinary embed.FS
+var commandSketchBinary embed.FS
 
 func main() {
 	espflashPath, err := helper.FindToolPath("espflash", semver.MustParse("2.0.0"))
@@ -88,7 +88,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 }
 
 // UploadCertificate performs a certificate upload on the board. The certificate must be in crt format
-// and be multiple of 4, otherwise `espflash` won't work!
+// and be multiple of 4, otherwise `espflash` won't work! (https://github.com/esp-rs/espflash/issues/440)
 func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath *paths.Path, feedback *helper.PluginFeedback) error {
 	if portAddress == "" {
 		fmt.Fprintln(feedback.Err(), "Port address not specified")
@@ -159,7 +159,9 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 
 	time.Sleep(3 * time.Second)
 
-	rebootUsingHID() // In case firmware version is v0.1.0 us HID to reboot
+	// Older firmware version (v0.1.0) do not support rebooting using the command sketch.
+	// So we use HID to reboot
+	rebootUsingHID()
 
 	time.Sleep(3 * time.Second)
 
@@ -167,7 +169,7 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 }
 
 func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *helper.PluginFeedback) error {
-	rebootData, err := rebootBinary.ReadFile("sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.bin")
+	rebootData, err := commandSketchBinary.ReadFile("sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.bin")
 	if err != nil {
 		return err
 	}

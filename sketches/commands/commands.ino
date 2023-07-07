@@ -1,5 +1,5 @@
 // To genereate the binaries run:
-// arduino-cli compile ./commands.ino --fqbn arduino:renesas_uno:unor4wifi -e
+// arduino-cli compile -e
 
 #include <Modem.h>
 
@@ -21,7 +21,7 @@ char waitResponse() {
 
 void reboot() {
   std::string res = "";
-  modem.write(std::string(PROMPT("+RESET=1")), res, CMD("+RESET=1"));
+  modem.write(std::string(PROMPT("+RESTARTBOOTLOADER")), res, CMD("+RESTARTBOOTLOADER"));
 }
 
 void version() {

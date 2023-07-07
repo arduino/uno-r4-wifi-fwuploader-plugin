@@ -4,21 +4,6 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/poetry-task/Taskfile.yml
-  poetry:install-deps:
-    desc: Install dependencies managed by Poetry
-    cmds:
-      - poetry install --no-root
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
-  docs:generate:
-    desc: Create all generated documentation content
-    deps:
-      - task: go:cli-docs
-    cmds:
-      # Make the formatting consistent with the non-generated Markdown
-      - task: general:format-prettier
-
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies-task/Taskfile.yml
   general:cache-dep-licenses:
     desc: Cache dependency license metadata
@@ -44,22 +29,6 @@ tasks:
     cmds:
       - licensed status
 
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
-  general:format-prettier:
-    desc: Format all supported files with Prettier
-    cmds:
-      - npx prettier --write .
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
-  go:cli-docs:
-    desc: Generate command line interface reference documentation
-    dir: ./docsgen
-    cmds:
-      # Command examples use os.Args[0] so the docs generation binary must have the same filename as the project
-      - go build -o {{.PROJECT_NAME}}{{exeExt}}
-      # The binary is invoked like this instead of `./{{.PROJECT_NAME}}` to remove the `./` chars from the examples
-      - PATH=. {{.PROJECT_NAME}} ../docs/commands
-
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:lint:
     desc: Lint Go code
@@ -74,62 +43,6 @@ tasks:
         golint \
           {{default "-min_confidence 0.8 -set_exit_status" .GO_LINT_FLAGS}} \
           {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
-  markdown:check-links:
-    desc: Check for broken links
-    deps:
-      - task: docs:generate
-    cmds:
-      - |
-        if [[ "{{.OS}}" == "Windows_NT" ]]; then
-          # npx --call uses the native shell, which makes it too difficult to use npx for this application on Windows,
-          # so the Windows user is required to have markdown-link-check installed and in PATH.
-          if ! which markdown-link-check &>/dev/null; then
-            echo "markdown-link-check not found or not in PATH."
-            echo "Please install: https://github.com/tcort/markdown-link-check#readme"
-            exit 1
-          fi
-          # Default behavior of the task on Windows is to exit the task when the first broken link causes a non-zero
-          # exit status, but it's better to check all links before exiting.
-          set +o errexit
-          STATUS=0
-          # Using -regex instead of -name to avoid Task's behavior of globbing even when quoted on Windows
-          # The odd method for escaping . in the regex is required for windows compatibility because mvdan.cc/sh gives
-          # \ characters special treatment on Windows in an attempt to support them as path separators.
-          for file in $(find . -regex ".*[.]md"); do
-            markdown-link-check \
-              --quiet \
-              --config "./.markdown-link-check.json" \
-              "$file"
-            STATUS=$(( $STATUS + $? ))
-          done
-          exit $STATUS
-        else
-          npx --package=markdown-link-check --call='
-            STATUS=0
-            for file in $(find . -regex ".*[.]md"); do
-              markdown-link-check \
-                --quiet \
-                --config "./.markdown-link-check.json" \
-                "$file"
-              STATUS=$(( $STATUS + $? ))
-            done
-            exit $STATUS
-          '
-        fi
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
-  markdown:fix:
-    desc: Automatically correct linting violations in Markdown files where possible
-    cmds:
-      - npx markdownlint-cli --fix "**/*.md"
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
-  markdown:lint:
-    desc: Check for problems in Markdown files
-    cmds:
-      - npx markdownlint-cli "**/*.md"
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/go-task/Taskfile.yml
   go:build:
@@ -165,15 +78,6 @@ tasks:
           {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}} \
           {{.TEST_LDFLAGS}}
 
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-integration-task/Taskfile.yml
-  go:test-integration:
-    desc: Run integration tests
-    deps:
-      - task: go:build
-      - task: poetry:install-deps
-    cmds:
-      - poetry run pytest test
-
   check:
     desc: Check fmt and lint
     cmds:
@@ -182,9 +86,6 @@ tasks:
       - task: go:lint
       - task: config:check
       - task: general:check-formatting
-      - task: markdown:check-links
-      - task: markdown:lint
-      - task: python:check
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-general-formatting-task/Taskfile.yml
   general:check-formatting:
@@ -197,44 +98,6 @@ tasks:
           exit 1
         fi
       - ec
-
-  python:check:
-    cmds:
-      - task: python:lint
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
-  python:lint:
-    desc: Lint Python code
-    deps:
-      - task: poetry:install-deps
-    cmds:
-      - poetry run flake8 --show-source
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
-  python:format:
-    desc: Format Python files
-    deps:
-      - task: poetry:install-deps
-    cmds:
-      - poetry run black .
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
-  website:check:
-    desc: Check whether the MkDocs-based website will build
-    deps:
-      - task: docs:generate
-      - task: poetry:install-deps
-    cmds:
-      - poetry run mkdocs build --strict
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
-  website:serve:
-    desc: Run website locally
-    deps:
-      - task: docs:generate
-      - task: poetry:install-deps
-    cmds:
-      - poetry run mkdocs serve
 
 vars:
   PROJECT_NAME: "uno-r4-wifi-fwuploader-plugin"

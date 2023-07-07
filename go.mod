@@ -2,7 +2,8 @@ module github.com/arduino/uno-r4-wifi-fwuploader-plugin
 
 go 1.20
 
-// using our forked version to fix HID on windows
+// On windows the SetFeature func is not working. We're using our forked version that applies a quick hack
+// to resolve that.
 replace github.com/karalabe/hid => github.com/bcmi-labs/hid v0.0.0-20230703110227-931f677e7f17
 
 require (
