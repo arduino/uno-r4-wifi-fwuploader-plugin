@@ -61,11 +61,9 @@ func (p *unoR4WifiPlugin) GetPluginInfo() *helper.PluginInfo {
 // UploadFirmware performs a firmware upload on the board
 func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths.Path, feedback *helper.PluginFeedback) error {
 	if portAddress == "" {
-		fmt.Fprintln(feedback.Err(), "Port address not specified")
 		return fmt.Errorf("invalid port address")
 	}
-	if firmwarePath == nil || firmwarePath.IsDir() {
-		fmt.Fprintln(feedback.Err(), "Invalid firmware path")
+	if firmwarePath == nil || firmwarePath.IsDir() || !firmwarePath.Exist() {
 		return fmt.Errorf("invalid firmware path")
 	}
 
@@ -91,11 +89,9 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 // and be multiple of 4, otherwise `espflash` won't work! (https://github.com/esp-rs/espflash/issues/440)
 func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath *paths.Path, feedback *helper.PluginFeedback) error {
 	if portAddress == "" {
-		fmt.Fprintln(feedback.Err(), "Port address not specified")
 		return fmt.Errorf("invalid port address")
 	}
-	if certificatePath == nil || certificatePath.IsDir() {
-		fmt.Fprintln(feedback.Err(), "Invalid certificate path")
+	if certificatePath == nil || certificatePath.IsDir() || !certificatePath.Exist() {
 		return fmt.Errorf("invalid certificate path")
 	}
 	fmt.Fprintf(feedback.Out(), "Uploading certificates to %s...\n", portAddress)
@@ -145,7 +141,9 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 }
 
 func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeedback) error {
-	p.uploadCommandsSketch(portAddress, feedback)
+	if err := p.uploadCommandsSketch(portAddress, feedback); err != nil {
+		return fmt.Errorf("upload commands sketch: %v", err)
+	}
 
 	port, err := openSerialPort(serialPort(portAddress))
 	if err != nil {
@@ -161,7 +159,9 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 
 	// Older firmware version (v0.1.0) do not support rebooting using the command sketch.
 	// So we use HID to reboot
-	rebootUsingHID()
+	if err := rebootUsingHID(); err != nil {
+		return err
+	}
 
 	time.Sleep(3 * time.Second)
 
@@ -179,12 +179,8 @@ func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *hel
 	}
 	defer rebootFile.Remove()
 
-	newPortAddress, err := serialutils.Reset(portAddress, false, nil, false)
-	if err != nil {
+	if _, err = serialutils.Reset(portAddress, true, nil, false); err != nil {
 		return err
-	}
-	if newPortAddress != "" {
-		portAddress = newPortAddress
 	}
 	cmd, err := executils.NewProcess(nil, p.bossacBin.String(), "--port="+portAddress, "-U", "-e", "-w", rebootFile.String(), "-R")
 	if err != nil {
