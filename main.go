@@ -121,7 +121,7 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 		return nil, err
 	}
 
-	port, err := serial.Open(serial.SerialPort(portAddress))
+	port, err := serial.Open(serial.Port(portAddress))
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 		return fmt.Errorf("upload commands sketch: %v", err)
 	}
 
-	port, err := serial.Open(serial.SerialPort(*portAddress))
+	port, err := serial.Open(serial.Port(*portAddress))
 	if err != nil {
 		return err
 	}

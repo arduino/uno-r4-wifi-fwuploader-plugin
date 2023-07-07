@@ -7,16 +7,16 @@ import (
 	"go.bug.st/serial"
 )
 
-type SerialCommand string
+type Command string
 
 const (
-	RebootCommand  SerialCommand = "r\n\r"
-	VersionCommand SerialCommand = "v\n\r"
+	RebootCommand  Command = "r\n\r"
+	VersionCommand Command = "v\n\r"
 )
 
-type SerialPort string
+type Port string
 
-func Open(portAddress SerialPort) (serial.Port, error) {
+func Open(portAddress Port) (serial.Port, error) {
 	return serial.Open(string(portAddress), &serial.Mode{
 		BaudRate: 9600,
 		Parity:   serial.NoParity,
@@ -25,7 +25,7 @@ func Open(portAddress SerialPort) (serial.Port, error) {
 	})
 }
 
-func SendCommandAndClose(port serial.Port, msg SerialCommand) error {
+func SendCommandAndClose(port serial.Port, msg Command) error {
 	if _, err := port.Write([]byte(string(msg))); err != nil {
 		return fmt.Errorf("write to serial port: %v", err)
 	}
