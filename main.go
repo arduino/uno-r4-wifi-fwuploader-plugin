@@ -142,6 +142,7 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 }
 
 func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFeedback) error {
+    // Will be used later to check if the OS changed the serial port.
 	allSerialPorts, err := serial.AllPorts()
 	if err != nil {
 		return err
@@ -163,6 +164,9 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 
 	time.Sleep(3 * time.Second)
 
+	// On Windows, when a board is successfully rebooted in esp32 mode, it will change the serial port.
+	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
+	// we'll wait the the 10 seconds timeout expiration.
 	newPort, changed, err := allSerialPorts.NewPort()
 	if err != nil {
 		return err
@@ -172,11 +176,16 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 	}
 
 	// Older firmware version (v0.1.0) do not support rebooting using the command sketch.
-	// So we use HID to reboot.
+	// So we use HID to reboot. We're consciosly ignoring the error because for boards
+	// running a firmware >= v0.2.0 will alaways throw an HID error as we're already in
+	// esp32 mode.
 	_ = rebootUsingHID()
 
 	time.Sleep(3 * time.Second)
 
+	// On Windows, when a board is successfully rebooted in esp32 mode, it will change the serial port.
+	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
+	// we'll wait the the 10 seconds timeout expiration.
 	newPort, changed, err = allSerialPorts.NewPort()
 	if err != nil {
 		return err
