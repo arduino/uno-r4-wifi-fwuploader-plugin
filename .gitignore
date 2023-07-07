@@ -15,7 +15,7 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 
 # Go workspace file
 go.work
@@ -25,6 +25,8 @@ main
 bossac
 espflash
 fw
+uno-r4-wifi-fwuploader-plugin
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.elf
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.hex
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.map
+/dist

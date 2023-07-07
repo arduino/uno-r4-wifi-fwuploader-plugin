@@ -15,8 +15,13 @@ import (
 )
 
 const (
-	pluginName    = "uno-r4-wifi-fwuploader"
-	pluginVersion = "1.0.0"
+	pluginName = "uno-r4-wifi-fwuploader"
+)
+
+var (
+	versionString = "0.0.0-git"
+	commit        = ""
+	date          = ""
 )
 
 //go:embed sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.bin
@@ -49,7 +54,7 @@ var _ helper.Plugin = (*unoR4WifiPlugin)(nil)
 func (p *unoR4WifiPlugin) GetPluginInfo() *helper.PluginInfo {
 	return &helper.PluginInfo{
 		Name:    pluginName,
-		Version: semver.MustParse(pluginVersion),
+		Version: semver.MustParse(versionString),
 	}
 }
 
