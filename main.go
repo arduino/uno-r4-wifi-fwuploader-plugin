@@ -150,6 +150,8 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 		return err
 	}
 
+	fmt.Fprintf(feedback.Out(), "Waiting to flash the binary...\n")
+
 	time.Sleep(3 * time.Second)
 
 	rebootUsingHID() // In case firmware version is v0.1.0 us HID to reboot
