@@ -68,7 +68,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 		return fmt.Errorf("reboot mode: %v", err)
 	}
 
-	cmd, err := executils.NewProcess([]string{}, p.espflashBin.String(), "flash", firmwarePath.String(), "-p", portAddress)
+	cmd, err := executils.NewProcess([]string{}, p.espflashBin.String(), "write-bin", "-p", portAddress, "-b", "115200", "0x0", firmwarePath.String())
 	if err != nil {
 		return err
 	}
