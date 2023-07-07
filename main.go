@@ -11,6 +11,7 @@ import (
 	"github.com/arduino/arduino-cli/executils"
 	helper "github.com/arduino/fwuploader-plugin-helper"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/serial"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -67,7 +68,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 		return fmt.Errorf("invalid firmware path")
 	}
 
-	if err := p.reboot(portAddress, feedback); err != nil {
+	if err := p.reboot(&portAddress, feedback); err != nil {
 		return fmt.Errorf("reboot mode: %v", err)
 	}
 
@@ -96,7 +97,7 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 	}
 	fmt.Fprintf(feedback.Out(), "Uploading certificates to %s...\n", portAddress)
 
-	if err := p.reboot(portAddress, feedback); err != nil {
+	if err := p.reboot(&portAddress, feedback); err != nil {
 		return fmt.Errorf("reboot mode: %v", err)
 	}
 
@@ -120,13 +121,13 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 		return nil, err
 	}
 
-	port, err := openSerialPort(serialPort(portAddress))
+	port, err := serial.Open(serial.SerialPort(portAddress))
 	if err != nil {
 		return nil, err
 	}
 	defer port.Close()
 
-	if _, err := port.Write([]byte(string(versionCommand))); err != nil {
+	if _, err := port.Write([]byte(string(serial.VersionCommand))); err != nil {
 		return nil, fmt.Errorf("write to serial port: %v", err)
 	}
 
@@ -140,16 +141,21 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 	return semver.ParseRelaxed(version), nil
 }
 
-func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeedback) error {
-	if err := p.uploadCommandsSketch(portAddress, feedback); err != nil {
-		return fmt.Errorf("upload commands sketch: %v", err)
-	}
-
-	port, err := openSerialPort(serialPort(portAddress))
+func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFeedback) error {
+	allSerialPorts, err := serial.AllPorts()
 	if err != nil {
 		return err
 	}
-	if err := sendSerialCommandAndClose(port, rebootCommand); err != nil {
+
+	if err := p.uploadCommandsSketch(*portAddress, feedback); err != nil {
+		return fmt.Errorf("upload commands sketch: %v", err)
+	}
+
+	port, err := serial.Open(serial.SerialPort(*portAddress))
+	if err != nil {
+		return err
+	}
+	if err := serial.SendCommandAndClose(port, serial.RebootCommand); err != nil {
 		return err
 	}
 
@@ -157,13 +163,27 @@ func (p *unoR4WifiPlugin) reboot(portAddress string, feedback *helper.PluginFeed
 
 	time.Sleep(3 * time.Second)
 
-	// Older firmware version (v0.1.0) do not support rebooting using the command sketch.
-	// So we use HID to reboot
-	if err := rebootUsingHID(); err != nil {
+	newPort, changed, err := allSerialPorts.NewPort()
+	if err != nil {
 		return err
 	}
+	if changed {
+		*portAddress = newPort
+	}
+
+	// Older firmware version (v0.1.0) do not support rebooting using the command sketch.
+	// So we use HID to reboot.
+	_ = rebootUsingHID()
 
 	time.Sleep(3 * time.Second)
+
+	newPort, changed, err = allSerialPorts.NewPort()
+	if err != nil {
+		return err
+	}
+	if changed {
+		*portAddress = newPort
+	}
 
 	return nil
 }
@@ -179,7 +199,7 @@ func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *hel
 	}
 	defer rebootFile.Remove()
 
-	if _, err = serialutils.Reset(portAddress, true, nil, false); err != nil {
+	if _, err = serialutils.Reset(portAddress, false, nil, false); err != nil {
 		return err
 	}
 	cmd, err := executils.NewProcess(nil, p.bossacBin.String(), "--port="+portAddress, "-U", "-e", "-w", rebootFile.String(), "-R")
