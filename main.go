@@ -142,7 +142,7 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 }
 
 func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFeedback) error {
-    // Will be used later to check if the OS changed the serial port.
+	// Will be used later to check if the OS changed the serial port.
 	allSerialPorts, err := serial.AllPorts()
 	if err != nil {
 		return err
