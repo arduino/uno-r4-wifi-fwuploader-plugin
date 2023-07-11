@@ -11,6 +11,7 @@ import (
 	"github.com/arduino/arduino-cli/executils"
 	helper "github.com/arduino/fwuploader-plugin-helper"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/certificate"
 	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/serial"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -101,7 +102,17 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 		return fmt.Errorf("reboot mode: %v", err)
 	}
 
-	cmd, err := executils.NewProcess([]string{}, p.espflashBin.String(), "write-bin", "-p", portAddress, "-b", "921600", "0x3C0000", certificatePath.String())
+	crtBundle, err := certificate.PemToCrt(certificatePath)
+	if err != nil {
+		return fmt.Errorf("certificate: %v", err)
+	}
+	crtFile, err := paths.WriteToTempFile(crtBundle, paths.TempDir(), "fw-uploader-uno-r4-wifi-cert")
+	if err != nil {
+		return err
+	}
+	defer crtFile.Remove()
+
+	cmd, err := executils.NewProcess([]string{}, p.espflashBin.String(), "write-bin", "-p", portAddress, "-b", "921600", "0x3C0000", crtFile.String())
 	if err != nil {
 		return err
 	}
