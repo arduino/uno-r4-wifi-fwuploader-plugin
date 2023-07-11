@@ -87,8 +87,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 	return nil
 }
 
-// UploadCertificate performs a certificate upload on the board. The certificate must be in crt format
-// and be multiple of 4, otherwise `espflash` won't work! (https://github.com/esp-rs/espflash/issues/440)
+// UploadCertificate performs a certificate upload on the board.
 func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath *paths.Path, feedback *helper.PluginFeedback) error {
 	if portAddress == "" {
 		return fmt.Errorf("invalid port address")
@@ -106,6 +105,13 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 	if err != nil {
 		return fmt.Errorf("certificate: %v", err)
 	}
+
+	// The certificate must be in crt format and be multiple of 4, otherwise `espflash` won't work!
+	// (https://github.com/esp-rs/espflash/issues/440)
+	for (len(crtBundle) & 3) != 0 {
+		crtBundle = append(crtBundle, 0xff)
+	}
+
 	crtFile, err := paths.WriteToTempFile(crtBundle, paths.TempDir(), "fw-uploader-uno-r4-wifi-cert")
 	if err != nil {
 		return err
