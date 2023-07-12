@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// To genereate the binaries run:
+// To generate the binaries run:
 // arduino-cli compile -e --profile unor4wifi
 
 #include <Modem.h>

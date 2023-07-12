@@ -45,7 +45,7 @@ func Open(portAddress string) (serial.Port, error) {
 	})
 }
 
-// SendCommandAndClose send a command and immediatly close the serial port afterwards.
+// SendCommandAndClose send a command and immediately close the serial port afterwards.
 func SendCommandAndClose(port serial.Port, msg Command) error {
 	if _, err := port.Write([]byte(string(msg))); err != nil {
 		return fmt.Errorf("write to serial port: %v", err)

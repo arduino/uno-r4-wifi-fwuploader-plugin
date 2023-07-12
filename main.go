@@ -207,7 +207,7 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 	slog.Info("check if serial port has changed")
 	// When a board is successfully rebooted in esp32 mode, it might change the serial port.
 	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
-	// we'll wait the the 10 seconds timeout expiration.
+	// we'll wait the 10 seconds timeout expiration.
 	newPort, changed, err := allSerialPorts.NewPort()
 	if err != nil {
 		return err
