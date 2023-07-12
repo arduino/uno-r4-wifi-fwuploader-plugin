@@ -24,13 +24,18 @@ import (
 	"go.bug.st/serial"
 )
 
+// Command represent a command sent through the serial port. This is used to distinguish
+// a command that will trigger a specific function of the `commands.ino` sketch.
 type Command string
 
 const (
-	RebootCommand  Command = "r\n\r"
+	// RebootCommand puts the board in ESP mode.
+	RebootCommand Command = "r\n\r"
+	// VersionCommand gets the semver firmware version.
 	VersionCommand Command = "v\n\r"
 )
 
+// Open used to open the given serial port at 9600 BaudRate
 func Open(portAddress string) (serial.Port, error) {
 	return serial.Open(portAddress, &serial.Mode{
 		BaudRate: 9600,
@@ -40,6 +45,7 @@ func Open(portAddress string) (serial.Port, error) {
 	})
 }
 
+// SendCommandAndClose send a command and immediatly close the serial port afterwards.
 func SendCommandAndClose(port serial.Port, msg Command) error {
 	if _, err := port.Write([]byte(string(msg))); err != nil {
 		return fmt.Errorf("write to serial port: %v", err)
@@ -51,6 +57,7 @@ func SendCommandAndClose(port serial.Port, msg Command) error {
 	return nil
 }
 
+// AllPorts returns the list of alla available serial ports.
 func AllPorts() (AvailablePorts, error) {
 	ports, err := serial.GetPortsList()
 	if err != nil {
@@ -63,8 +70,11 @@ func AllPorts() (AvailablePorts, error) {
 	return res, nil
 }
 
+// AvailablePorts represent all the available serial ports
 type AvailablePorts map[string]bool
 
+// NewPort every 250ms checks if a new serial port is detected, for a maximum of 10 seconds.
+// If a new serial port is detect it's added to the AvailablePorts map and returned as a string.
 func (last *AvailablePorts) NewPort() (string, bool, error) {
 	deadline := time.Now().Add(10 * time.Second)
 	for time.Now().Before(deadline) {

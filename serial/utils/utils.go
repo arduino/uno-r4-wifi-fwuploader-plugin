@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Those function are token from https://github.com/arduino/arduino-cli/blob/master/arduino/serialutils/serialutils.go
+// Package utils contains functions token from https://github.com/arduino/arduino-cli/blob/master/arduino/serialutils/serialutils.go
 // that's because we don't have the `tr` here and importing the serialutils from the cli will lead to a panic
 package utils
 
