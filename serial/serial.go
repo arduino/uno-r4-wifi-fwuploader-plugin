@@ -14,10 +14,8 @@ const (
 	VersionCommand Command = "v\n\r"
 )
 
-type Port string
-
-func Open(portAddress Port) (serial.Port, error) {
-	return serial.Open(string(portAddress), &serial.Mode{
+func Open(portAddress string) (serial.Port, error) {
+	return serial.Open(portAddress, &serial.Mode{
 		BaudRate: 9600,
 		Parity:   serial.NoParity,
 		DataBits: 8,

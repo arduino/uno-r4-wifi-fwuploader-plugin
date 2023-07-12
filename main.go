@@ -14,6 +14,7 @@ import (
 	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/certificate"
 	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/serial"
 	semver "go.bug.st/relaxed-semver"
+	serialx "go.bug.st/serial"
 )
 
 const (
@@ -138,24 +139,13 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helpe
 		return nil, err
 	}
 
-	port, err := serial.Open(serial.Port(portAddress))
+	port, err := serial.Open(portAddress)
 	if err != nil {
 		return nil, err
 	}
 	defer port.Close()
 
-	if _, err := port.Write([]byte(string(serial.VersionCommand))); err != nil {
-		return nil, fmt.Errorf("write to serial port: %v", err)
-	}
-
-	var version string
-	scanner := bufio.NewScanner(port)
-	for scanner.Scan() {
-		version = scanner.Text()
-		break
-	}
-
-	return semver.ParseRelaxed(version), nil
+	return getFirmwareVersion(port)
 }
 
 func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFeedback) error {
@@ -169,19 +159,31 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 		return fmt.Errorf("upload commands sketch: %v", err)
 	}
 
-	port, err := serial.Open(serial.Port(*portAddress))
+	fmt.Fprintf(feedback.Out(), "\nWaiting to flash the binary...\n")
+
+	port, err := serial.Open(*portAddress)
 	if err != nil {
 		return err
 	}
-	if err := serial.SendCommandAndClose(port, serial.RebootCommand); err != nil {
+
+	// Get version to decide if we need to reboot with hid or not
+	version, err := getFirmwareVersion(port)
+	if err != nil {
 		return err
 	}
 
-	fmt.Fprintf(feedback.Out(), "Waiting to flash the binary...\n")
+	// Older firmware version (v0.1.0) can be rebooted only with HID.
+	if version.LessThanOrEqual(semver.ParseRelaxed("0.1.0")) {
+		if err := rebootUsingHID(); err != nil {
+			return err
+		}
+	} else {
+		if err := serial.SendCommandAndClose(port, serial.RebootCommand); err != nil {
+			return err
+		}
+	}
 
-	time.Sleep(3 * time.Second)
-
-	// On Windows, when a board is successfully rebooted in esp32 mode, it will change the serial port.
+	// When a board is successfully rebooted in esp32 mode, it might change the serial port.
 	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
 	// we'll wait the the 10 seconds timeout expiration.
 	newPort, changed, err := allSerialPorts.NewPort()
@@ -191,26 +193,6 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 	if changed {
 		*portAddress = newPort
 	}
-
-	// Older firmware version (v0.1.0) do not support rebooting using the command sketch.
-	// So we use HID to reboot. We're consciosly ignoring the error because for boards
-	// running a firmware >= v0.2.0 will alaways throw an HID error as we're already in
-	// esp32 mode.
-	_ = rebootUsingHID()
-
-	time.Sleep(3 * time.Second)
-
-	// On Windows, when a board is successfully rebooted in esp32 mode, it will change the serial port.
-	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
-	// we'll wait the the 10 seconds timeout expiration.
-	newPort, changed, err = allSerialPorts.NewPort()
-	if err != nil {
-		return err
-	}
-	if changed {
-		*portAddress = newPort
-	}
-
 	return nil
 }
 
@@ -240,4 +222,19 @@ func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *hel
 
 	time.Sleep(1 * time.Second)
 	return nil
+}
+
+func getFirmwareVersion(port serialx.Port) (*semver.RelaxedVersion, error) {
+	if _, err := port.Write([]byte(string(serial.VersionCommand))); err != nil {
+		return nil, fmt.Errorf("write to serial port: %v", err)
+	}
+
+	var version string
+	scanner := bufio.NewScanner(port)
+	for scanner.Scan() {
+		version = scanner.Text()
+		break
+	}
+
+	return semver.ParseRelaxed(version), nil
 }

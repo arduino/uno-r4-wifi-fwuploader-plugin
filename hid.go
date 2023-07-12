@@ -21,7 +21,7 @@ func rebootUsingHID() error {
 	b[0] = 0
 	b[1] = 0xAA
 	if _, err := d.SendFeatureReport(b); err != nil {
-		return err
+        return fmt.Errorf("send HID command: %v", err)
 	}
 
 	return nil
