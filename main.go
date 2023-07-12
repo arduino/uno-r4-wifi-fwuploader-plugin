@@ -7,12 +7,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/executils"
 	helper "github.com/arduino/fwuploader-plugin-helper"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/certificate"
 	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/serial"
+	serialutils "github.com/arduino/uno-r4-wifi-fwuploader-plugin/serial/utils"
 	semver "go.bug.st/relaxed-semver"
 	serialx "go.bug.st/serial"
 	"golang.org/x/exp/slog"
@@ -215,7 +215,7 @@ func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *hel
 	defer rebootFile.Remove()
 
 	slog.Info("sending serial reset")
-	if _, err = serialutils.Reset(portAddress, false, nil, false); err != nil {
+	if err := serialutils.TouchSerialPortAt1200bps(portAddress); err != nil {
 		return err
 	}
 
