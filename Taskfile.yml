@@ -140,7 +140,7 @@ vars:
   TIMESTAMP_SHORT:
     sh: echo "{{now | date "20060102"}}"
   TAG:
-    sh: "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
+    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
   VERSION: "{{if .NIGHTLY}}0.0.0-nightly-{{.TIMESTAMP_SHORT}}{{else if .TAG}}{{.TAG}}{{else}}0.0.0-git-snapshot{{end}}"
   CONFIGURATION_PACKAGE: main
   LDFLAGS: >
@@ -150,13 +150,4 @@ vars:
     -X {{.CONFIGURATION_PACKAGE}}.commit={{ .COMMIT }}
     -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
-  # test vars
-  TEST_VERSION: "0.0.0-test.preview"
-  TEST_COMMIT: "deadbeef"
-  TEST_LDFLAGS: >
-    -ldflags
-    '
-    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.TEST_VERSION}}
-    -X {{.CONFIGURATION_PACKAGE}}.commit={{.TEST_COMMIT}}
-    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
-    '
+
