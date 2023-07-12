@@ -2,15 +2,6 @@
 sources:
   go: true
 
-apps:
-  - source_path: ./
-
-reviewed:
-  go:
-    - typed-rest-client
-    - "@actions/http-client"
-
-
 reviewed:
   go:
     - github.com/arduino/go-paths-helper
@@ -24,7 +15,6 @@ reviewed:
     - golang.org/x/text/internal/language/compact
     - golang.org/x/text/internal/tag
     - golang.org/x/text/language
-
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/AGPL-3.0/.licensed.yml
 allowed:

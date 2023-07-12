@@ -1,6 +1,9 @@
 # uno-r4-wifi-fwuploader-plugin
 
+[![Check Go Dependencies status](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-go-dependencies-task.yml/badge.svg)](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-go-dependencies-task.yml)
+
 Be sure to have `libudev-dev` installed
 
 ### Ubuntu:
+
 `sudo apt install libudev-dev`
