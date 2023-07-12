@@ -15,6 +15,7 @@ import (
 	"github.com/arduino/uno-r4-wifi-fwuploader-plugin/serial"
 	semver "go.bug.st/relaxed-semver"
 	serialx "go.bug.st/serial"
+	"golang.org/x/exp/slog"
 )
 
 const (
@@ -166,6 +167,7 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 		return err
 	}
 
+	slog.Info("getting firmware version")
 	// Get version to decide if we need to reboot with hid or not
 	version, err := getFirmwareVersion(port)
 	if err != nil {
@@ -174,15 +176,18 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 
 	// Older firmware version (v0.1.0) can be rebooted only with HID.
 	if version.LessThanOrEqual(semver.ParseRelaxed("0.1.0")) {
+		slog.Info("firmware version is 0.1.0 using HID")
 		if err := rebootUsingHID(); err != nil {
 			return err
 		}
 	} else {
+		slog.Info("firmware version is > 0.1.0 using sketch")
 		if err := serial.SendCommandAndClose(port, serial.RebootCommand); err != nil {
 			return err
 		}
 	}
 
+	slog.Info("check if serial port has changed")
 	// When a board is successfully rebooted in esp32 mode, it might change the serial port.
 	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
 	// we'll wait the the 10 seconds timeout expiration.
@@ -197,6 +202,8 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 }
 
 func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *helper.PluginFeedback) error {
+	slog.Info("upload_command_sketch")
+
 	rebootData, err := commandSketchBinary.ReadFile("sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.bin")
 	if err != nil {
 		return err
@@ -207,9 +214,12 @@ func (p *unoR4WifiPlugin) uploadCommandsSketch(portAddress string, feedback *hel
 	}
 	defer rebootFile.Remove()
 
+	slog.Info("sending serial reset")
 	if _, err = serialutils.Reset(portAddress, false, nil, false); err != nil {
 		return err
 	}
+
+	slog.Info("uploading command sketch with bossac")
 	cmd, err := executils.NewProcess(nil, p.bossacBin.String(), "--port="+portAddress, "-U", "-e", "-w", rebootFile.String(), "-R")
 	if err != nil {
 		return err

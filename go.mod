@@ -13,6 +13,7 @@ require (
 	github.com/karalabe/hid v0.0.0-00010101000000-000000000000
 	go.bug.st/relaxed-semver v0.11.0
 	go.bug.st/serial v1.5.0
+	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 )
 
 require (
