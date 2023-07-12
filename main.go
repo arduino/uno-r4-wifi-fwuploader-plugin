@@ -63,7 +63,7 @@ func (p *unoR4WifiPlugin) GetPluginInfo() *helper.PluginInfo {
 }
 
 // UploadFirmware performs a firmware upload on the board
-func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths.Path, feedback *helper.PluginFeedback) error {
+func (p *unoR4WifiPlugin) UploadFirmware(portAddress, fqbn string, firmwarePath *paths.Path, feedback *helper.PluginFeedback) error {
 	if portAddress == "" {
 		return fmt.Errorf("invalid port address")
 	}
@@ -90,7 +90,7 @@ func (p *unoR4WifiPlugin) UploadFirmware(portAddress string, firmwarePath *paths
 }
 
 // UploadCertificate performs a certificate upload on the board.
-func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath *paths.Path, feedback *helper.PluginFeedback) error {
+func (p *unoR4WifiPlugin) UploadCertificate(portAddress, fqbn string, certificatePath *paths.Path, feedback *helper.PluginFeedback) error {
 	if portAddress == "" {
 		return fmt.Errorf("invalid port address")
 	}
@@ -135,7 +135,7 @@ func (p *unoR4WifiPlugin) UploadCertificate(portAddress string, certificatePath 
 }
 
 // GetFirmwareVersion retrieve the firmware version installed on the board
-func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress string, feedback *helper.PluginFeedback) (*semver.RelaxedVersion, error) {
+func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress, fqbn string, feedback *helper.PluginFeedback) (*semver.RelaxedVersion, error) {
 	if err := p.uploadCommandsSketch(portAddress, feedback); err != nil {
 		return nil, err
 	}

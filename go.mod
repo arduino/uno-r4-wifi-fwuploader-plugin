@@ -8,7 +8,7 @@ replace github.com/karalabe/hid => github.com/bcmi-labs/hid v0.0.0-2023070311022
 
 require (
 	github.com/arduino/arduino-cli v0.0.0-20230706071323-df12786440c1
-	github.com/arduino/fwuploader-plugin-helper v0.0.0-20230706160803-17fd16a4651c
+	github.com/arduino/fwuploader-plugin-helper v0.0.0-20230712140228-66fc6aaed11b
 	github.com/arduino/go-paths-helper v1.9.1
 	github.com/karalabe/hid v0.0.0-00010101000000-000000000000
 	go.bug.st/relaxed-semver v0.11.0
