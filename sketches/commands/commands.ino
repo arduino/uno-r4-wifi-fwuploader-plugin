@@ -1,23 +1,7 @@
 // To genereate the binaries run:
-// arduino-cli compile -e
+// arduino-cli compile -e --profile unor4wifi
 
 #include <Modem.h>
-
-char waitResponse() {
-  while (true) {
-    if (Serial.available()) {
-      char choice = Serial.read();
-      switch (choice) {
-        case 'r':
-          return 'r';
-        case 'v':
-          return 'v';
-        default:
-          continue;
-      }
-    }
-  }
-}
 
 void reboot() {
   std::string res = "";
@@ -39,18 +23,22 @@ void version() {
 void setup() {
   Serial.begin(9600);
   modem.begin();
-  char command = waitResponse();
-
-  switch (command) {
-    case 'r':
-      reboot();
-      break;
-    case 'v':
-      version();
-      break;
-  }
 }
 
 void loop() {
-
+  while (true) {
+    if (Serial.available()) {
+      char choice = Serial.read();
+      switch (choice) {
+        case 'r':
+            reboot();
+            break;
+        case 'v':
+            version();
+            break;
+        default:
+          continue;
+      }
+    }
+  }
 }
