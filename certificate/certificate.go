@@ -22,6 +22,7 @@ import (
 	"crypto/x509"
 	"encoding/binary"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"sort"
 
@@ -52,6 +53,9 @@ func PemToCrt(p *paths.Path) ([]byte, error) {
 	der := []byte{}
 	for {
 		block, next := pem.Decode(f)
+		if block == nil && len(next) > 0 {
+			return nil, errors.New("invalid pem content")
+		}
 		if block != nil {
 			der = append(der, block.Bytes...)
 			f = next

@@ -65,3 +65,36 @@ func TestCertificates(t *testing.T) {
 		})
 	}
 }
+
+func TestCertificatesWithInvalidInputs(t *testing.T) {
+	i1 := `
+-----BEGIN CERTIFICATE-----
+asdf
+-----END CERTIFICATE-----
+invalid`
+
+	i2 := `
+-----BEGIN CERTIFICATE-----
+asdf
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----`
+
+	i3 := `
+-----BEGIN CERTIFICATE-----
+asdf
+-----END CERTIFICATE-----
+-----END CERTIFICATE-----`
+
+	for _, i := range []string{i1, i2, i3} {
+		f, err := paths.MkTempFile(paths.New(t.TempDir()), "invalid-pem")
+		require.NoError(t, err)
+
+		_, err = f.WriteString(i)
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
+
+		result, err := PemToCrt(paths.New(f.Name()))
+		require.ErrorContains(t, err, "invalid pem content")
+		require.Nil(t, result)
+	}
+}
