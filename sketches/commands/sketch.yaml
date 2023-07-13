@@ -1,0 +1,5 @@
+profiles:
+  unor4wifi:
+    fqbn: arduino:renesas_uno:unor4wifi
+    platforms:
+      - platform: arduino:renesas_uno (1.0.1)
