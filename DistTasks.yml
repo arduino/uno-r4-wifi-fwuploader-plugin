@@ -253,6 +253,8 @@ tasks:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.gz | cut -f1 -d " "
       LINUXARM_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARMv6.tar.gz | cut -f1 -d " "
+      LINUXARMV7_SHA:
+        sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARMv7.tar.gz | cut -f1 -d " "
       LINUXARM64_SHA:
         sh: sha256sum {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f1 -d " "
       OSX64_SHA:
@@ -269,6 +271,8 @@ tasks:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_64bit.tar.gz | cut -f5 -d " "
       LINUXARM_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARMv6.tar.gz | cut -f5 -d " "
+      LINUXARMV7_SIZE:
+        sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARMv7.tar.gz | cut -f5 -d " "
       LINUXARM64_SIZE:
         sh: ls -la {{ .DIST_DIR }}/{{ .PROJECT_NAME }}_{{ .VERSION }}_Linux_ARM64.tar.gz | cut -f5 -d " "
       OSX64_SIZE:
@@ -286,6 +290,8 @@ tasks:
         sed "s/%%LINUX32_SIZE%%/{{ .LINUX32_SIZE }}/" |
         sed "s/%%LINUXARM_SHA%%/{{ .LINUXARM_SHA }}/" |
         sed "s/%%LINUXARM_SIZE%%/{{ .LINUXARM_SIZE }}/" |
+        sed "s/%%LINUXARMV7_SHA%%/{{ .LINUXARMV7_SHA }}/" |
+        sed "s/%%LINUXARMV7_SIZE%%/{{ .LINUXARMV7_SIZE }}/" |
         sed "s/%%LINUXARM64_SHA%%/{{ .LINUXARM64_SHA }}/" |
         sed "s/%%LINUXARM64_SIZE%%/{{ .LINUXARM64_SIZE }}/" |
         sed "s/%%OSX64_SHA%%/{{ .OSX64_SHA }}/" |
