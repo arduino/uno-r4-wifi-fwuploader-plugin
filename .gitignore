@@ -27,6 +27,7 @@ bossac
 espflash
 fw
 uno-r4-wifi-fwuploader-plugin
+uno-r4-wifi-fwuploader-plugin.exe
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.elf
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.hex
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.map
