@@ -150,4 +150,7 @@ vars:
     -X {{.CONFIGURATION_PACKAGE}}.commit={{ .COMMIT }}
     -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
+  # `-ldflags` flag to use for `go test` command
+  # TODO: define flag if required by the project, or leave empty if not needed.
+  TEST_LDFLAGS:
 
