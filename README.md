@@ -9,6 +9,7 @@
 [![Check Markdown status](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-markdown-task.yml/badge.svg)](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-markdown-task.yml)
 [![Check License status](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-license.yml/badge.svg)](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-license.yml)
 [![Check Taskfiles status](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-taskfiles.yml/badge.svg)](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-taskfiles.yml)
+[![Check Workflows status](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-workflows-task.yml/badge.svg)](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/actions/workflows/check-workflows-task.yml)
 [![Codecov](https://codecov.io/gh/arduino/uno-r4-wifi-fwuploader-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/arduino/uno-r4-wifi-fwuploader-plugin)
 
 Be sure to have `libudev-dev` installed
