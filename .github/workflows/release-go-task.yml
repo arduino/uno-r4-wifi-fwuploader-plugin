@@ -163,7 +163,7 @@ jobs:
           chmod +x "${PLATFORM_DIR}/${{ env.PROJECT_NAME }}"
           TAG="${GITHUB_REF/refs\/tags\//}"
           PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_${{ matrix.artifact.path }}"
-          tar -czv ${PLATFORM_DIR} -f "$PACKAGE_FILENAME"
+          tar -czvf "$PACKAGE_FILENAME" "${PLATFORM_DIR}"
           echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
 
       - name: Upload artifact
