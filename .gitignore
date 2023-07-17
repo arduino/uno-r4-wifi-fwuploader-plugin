@@ -32,3 +32,5 @@ sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.elf
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.hex
 sketches/commands/build/arduino.renesas_uno.unor4wifi/commands.ino.map
 /dist
+
+/node_modules/
