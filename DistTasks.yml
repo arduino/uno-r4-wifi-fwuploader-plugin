@@ -30,7 +30,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -54,7 +54,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -78,7 +78,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -102,7 +102,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -112,9 +112,7 @@ tasks:
     vars:
       PLATFORM_DIR: "{{.PROJECT_NAME}}_linux_amd64"
       BUILD_COMMAND: >
-        apt update &&
-        apt install libudev-dev libusb-1.0-0-dev -y &&
-        go build -tags libusb -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
+        go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}
       BUILD_PLATFORM: "linux/amd64"
       CONTAINER_TAG: "{{.GO_VERSION}}-main"
       PACKAGE_PLATFORM: "Linux_64bit"
@@ -128,7 +126,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -152,7 +150,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0   \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -176,7 +174,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -201,7 +199,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "git config --global --add safe.directory /home/build && {{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -226,7 +224,7 @@ tasks:
         mkdir {{.PLATFORM_DIR}}
         cp ../LICENSE.txt {{.PLATFORM_DIR}}/
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=0 \
+        -e CGO_ENABLED=1 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "git config --global --add safe.directory /home/build && {{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
