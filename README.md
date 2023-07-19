@@ -19,7 +19,7 @@ business logic needed to update firmware and certificates for the [uno r4 wifi](
 
 Contributions are welcome!
 
-:sparkles: Thanks to all our [contributors]! :sparkles:
+:sparkles: Thanks to all our [contributors](https://github.com/arduino/uno-r4-wifi-fwuploader-plugin/graphs/contributors)! :sparkles:
 
 ### Requirements
 
