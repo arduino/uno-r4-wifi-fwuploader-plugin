@@ -34,7 +34,7 @@ func TouchSerialPortAt1200bps(port string) error {
 	// Open port
 	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
 	if err != nil {
-		return fmt.Errorf("opening port at 1200bps")
+		return fmt.Errorf("opening port %s at 1200bps, err: %w", port, err)
 	}
 
 	if runtime.GOOS != "windows" {
@@ -44,7 +44,7 @@ func TouchSerialPortAt1200bps(port string) error {
 		// Set DTR to false
 		if err = p.SetDTR(false); err != nil {
 			p.Close()
-			return fmt.Errorf("setting DTR to OFF")
+			return fmt.Errorf("setting DTR to OFF, err: %w", err)
 		}
 	}
 
