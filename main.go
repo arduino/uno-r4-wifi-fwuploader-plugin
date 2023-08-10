@@ -168,7 +168,7 @@ func (p *unoR4WifiPlugin) GetFirmwareVersion(portAddress, fqbn string, feedback 
 
 func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFeedback) error {
 	// Will be used later to check if the OS changed the serial port.
-	allSerialPorts, err := serial.AllPorts()
+	detector, err := serial.NewPortDetector()
 	if err != nil {
 		return err
 	}
@@ -208,12 +208,12 @@ func (p *unoR4WifiPlugin) reboot(portAddress *string, feedback *helper.PluginFee
 	// When a board is successfully rebooted in esp32 mode, it might change the serial port.
 	// Every 250ms we're watching for new ports, if a new one is found we return that otherwise
 	// we'll wait the 10 seconds timeout expiration.
-	newPort, changed, err := allSerialPorts.NewPort()
+	newPort, changed, err := detector.DetectNewPorts()
 	if err != nil {
 		return err
 	}
 	if changed {
-		*portAddress = newPort
+		*portAddress = newPort[0]
 	}
 	return nil
 }

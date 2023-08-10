@@ -57,35 +57,56 @@ func SendCommandAndClose(port serial.Port, msg Command) error {
 	return nil
 }
 
-// AllPorts returns the list of alla available serial ports.
-func AllPorts() (AvailablePorts, error) {
-	ports, err := serial.GetPortsList()
-	if err != nil {
-		return nil, fmt.Errorf("listing serial ports: %v", err)
-	}
-	res := map[string]bool{}
-	for _, port := range ports {
-		res[port] = true
-	}
-	return res, nil
+type PortDetector struct {
+	ports              map[string]bool
+	deadLine           time.Duration
+	detectionFrequency time.Duration
 }
 
-// AvailablePorts represent all the available serial ports
-type AvailablePorts map[string]bool
+type PortDetectorOption func(*PortDetector)
 
-// NewPort every 250ms checks if a new serial port is detected, for a maximum of 10 seconds.
-// If a new serial port is detect it's added to the AvailablePorts map and returned as a string.
-func (last *AvailablePorts) NewPort() (string, bool, error) {
-	deadline := time.Now().Add(10 * time.Second)
+func WithDeadline(deadline time.Duration) PortDetectorOption {
+	return func(h *PortDetector) {
+		h.deadLine = deadline
+	}
+}
+
+func WithDetectionFrequency(frequency time.Duration) PortDetectorOption {
+	return func(h *PortDetector) {
+		h.detectionFrequency = frequency
+	}
+}
+
+func NewPortDetector(opts ...PortDetectorOption) (*PortDetector, error) {
+	const (
+		deadline  = 10 * time.Second
+		frequency = 250 * time.Millisecond
+	)
+
+	res, err := getAllAvailablePorts()
+	if err != nil {
+		return nil, err
+	}
+	d := &PortDetector{ports: res, deadLine: deadline, detectionFrequency: frequency}
+
+	for _, opt := range opts {
+		opt(d)
+	}
+
+	return d, nil
+}
+
+func (d *PortDetector) DetectNewPorts() ([]string, bool, error) {
+	deadline := time.Now().Add(d.deadLine)
 	for time.Now().Before(deadline) {
-		now, err := AllPorts()
+		now, err := getAllAvailablePorts()
 		if err != nil {
-			return "", false, err
+			return nil, false, err
 		}
 
 		hasNewPorts := false
 		for p := range now {
-			if !(*last)[p] {
+			if !(d.ports)[p] {
 				hasNewPorts = true
 				break
 			}
@@ -101,20 +122,48 @@ func (last *AvailablePorts) NewPort() (string, bool, error) {
 			// the USB serial port appearing and disappearing rapidly before
 			// settling.
 			// This check ensure that the port is stable after one second.
-			check, err := AllPorts()
+			check, err := getAllAvailablePorts()
 			if err != nil {
-				return "", false, err
+				return nil, false, err
 			}
+
+			newPorts := []string{}
+			newPortFound := false
 			for p := range check {
-				if !(*last)[p] {
-					return p, true, nil // Found it!
+				if !(d.ports)[p] {
+					newPortFound = true
+					newPorts = append(newPorts, p)
 				}
+			}
+			if newPortFound {
+				return newPorts, true, nil // Found it!
 			}
 		}
 
-		*last = now
-		time.Sleep(250 * time.Millisecond)
+		d.ports = now
+		time.Sleep(d.detectionFrequency)
 	}
 
-	return "", false, nil
+	return nil, false, nil
+}
+
+func (d *PortDetector) Reset() error {
+	res, err := getAllAvailablePorts()
+	if err != nil {
+		return err
+	}
+	d.ports = res
+	return nil
+}
+
+func getAllAvailablePorts() (map[string]bool, error) {
+	ports, err := serial.GetPortsList()
+	if err != nil {
+		return nil, fmt.Errorf("listing serial ports: %v", err)
+	}
+	res := map[string]bool{}
+	for _, port := range ports {
+		res[port] = true
+	}
+	return res, nil
 }
