@@ -52,6 +52,13 @@
               "size": "%%LINUXARM_SIZE%%"
             },
             {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://downloads.arduino.cc/arduino-fwuploader/plugins/%%FILENAME%%_%%VERSION%%_Linux_ARMv7.tar.gz",
+              "archiveFileName": "%%FILENAME%%_%%VERSION%%_Linux_ARMv7.tar.gz",
+              "checksum": "SHA-256:%%LINUXARM_SHA%%",
+              "size": "%%LINUXARM_SIZE%%"
+            },
+            {
               "host": "aarch64-linux-gnu",
               "url": "http://downloads.arduino.cc/arduino-fwuploader/plugins/%%FILENAME%%_%%VERSION%%_Linux_ARM64.tar.gz",
               "archiveFileName": "%%FILENAME%%_%%VERSION%%_Linux_ARM64.tar.gz",
